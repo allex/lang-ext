@@ -1,0 +1,29 @@
+{
+  "name": "lang-ext",
+  "description": "Lang utilities for nodejs",
+  "version": "1.0.0",
+  "author": {
+    "name": "Allex Wang",
+    "email": "allex.wxn@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/allex/lang-ext.git"
+  },
+  "bugs": {
+    "url": "https://github.com/allex/lang-ext/issues"
+  },
+  "engines": [
+    "node >= 0.3.6"
+  ],
+  "main": "./lib/lang.js",
+  "scripts": {
+    "test": "node ./node_modules/tad/bin/tad lib"
+  },
+  "devDependencies": {
+    "tad": "0.1.x"
+  },
+  "dependencies": {},
+  "bundleDependencies": [],
+  "readmeFilename": "README.md"
+}
