@@ -5,16 +5,15 @@
  * Licensed under the MIT license.
  */
 
-var _slice = [].slice;
+'use strict';
 
-function isBoolean(o) {
-    typeof o === 'boolean';
-}
+var slice = [].slice;
+var isBoolean = function(o) { return typeof o === 'boolean'; };
 
 function _mix(r, s, deep, force) {
     for (var k in s) if (s.hasOwnProperty(k)) {
         if (s[k] && r[k] && deep && typeof s[k] === 'object') {
-            _mix(r[k], s[k]);
+            _mix(r[k], s[k], deep, force);
         } else {
             if (r[k] === undefined || force) {
                 r[k] = s[k];
@@ -25,7 +24,7 @@ function _mix(r, s, deep, force) {
 }
 
 function mix(o, s, deep, force) {
-    var args = _slice.call(arguments, 1), l = args.length, t;
+    var args = slice.call(arguments, 1), l = args.length, t;
 
     if (l && isBoolean(t = args[l - 1])) {
         force = t; --l;
@@ -43,9 +42,9 @@ function mix(o, s, deep, force) {
 }
 
 function merge(r, s) {
-    var o = {}, args = _slice.call(arguments, 0);
+    var o = {}, args = slice.call(arguments, 0);
     args.unshift(o);
-    _mix.apply(null, args);
+    mix.apply(null, args);
     return o;
 }
 
@@ -59,33 +58,32 @@ function forEach(o, fn) {
 }
 
 var lang = {
-    isBoolean: isBoolean,
-
     /**
      * mixin dist object to receiver.
+     *
      * @method mix
      */
     mix: mix,
 
     /**
      * merge object to a new object.
+     *
      * @method merge
      */
     merge: merge,
 
     /**
      * Generic forEach for array or object.
+     *
      * @param {Object|Array} o
      * @param {Function} fn iterator callback function.
      */
-    forEach: forEach,
-
-    // lang.* namespace exports
-    array: require('./lang/array'),
-    string: require('./lang/string')
+    forEach: forEach
 };
 
-// add lang.sha1/md5/sha256/sha512/ripemd160
-lang.mix(lang, require('./lang/hash'));
+// alias lang namespces.
+['hash', 'string', 'array'].forEach(function(ns) {
+    lang[ns] = require('./' + ns);
+});
 
 module.exports = lang;

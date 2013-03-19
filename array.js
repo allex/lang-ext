@@ -7,16 +7,14 @@
 
 // unique array
 exports.unique = function(array) {
-    var m, n = [],
-    o = {};
-    for (var i = 0;
-    (m = array[i]) !== undefined; i++) {
-        if (!o[m]) {
-            n.push(m);
-            o[m] = true;
+    var arr = [];
+    for (var i = -1, l = array.length, el; ++i < l; ) {
+        el = array[i];
+        if (arr.indexOf(el) === -1) {
+            arr.push(el);
         }
     }
-    return n;
+    return arr;
 };
 
 // Assuming |array_of_dictionaries| is structured like this:
