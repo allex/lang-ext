@@ -5,10 +5,9 @@
  * Licensed under the MIT license.
  */
 
-'use strict';
+(function(require, exports, module) {
 
-var slice = [].slice;
-var isBoolean = function(o) { return typeof o === 'boolean'; };
+'use strict';
 
 function _mix(r, s, deep, force) {
     for (var k in s) if (s.hasOwnProperty(k)) {
@@ -23,50 +22,89 @@ function _mix(r, s, deep, force) {
     return r;
 }
 
-function mix(o, s, deep, force) {
-    var args = slice.call(arguments, 1), l = args.length, t;
+var slice = [].slice,
+    nativeUtil = require('util'),
 
-    if (l && isBoolean(t = args[l - 1])) {
-        force = t; --l;
-    }
-    if (l && isBoolean(t = args[l - 1])) {
-        deep = t; --l;
-    }
+    isBoolean = function(o) {
+        return typeof o === 'boolean';
+    },
 
-    for (var i = -1; ++i < l; ) {
-        t = args[i];
-        _mix(o, t, deep, force);
-    }
+    mix = function(o, s, deep, force) {
+        var args = slice.call(arguments, 1), l = args.length, t;
 
-    return o;
-}
-
-function merge(r, s) {
-    var o = {}, args = slice.call(arguments, 0);
-    args.unshift(o);
-    mix.apply(null, args);
-    return o;
-}
-
-function forEach(o, fn) {
-    if (Array.isArray(o)) return o.forEach(fn);
-    else for (var k in o) {
-        if (o.hasOwnProperty(k)) {
-            fn(o[k], k);
+        if (l && isBoolean(t = args[l - 1])) {
+            force = t; --l;
         }
-    }
-}
+        if (l && isBoolean(t = args[l - 1])) {
+            deep = t; --l;
+        }
+
+        for (var i = -1; ++i < l; ) {
+            t = args[i];
+            _mix(o, t, deep, force);
+        }
+
+        return o;
+    },
+
+    // Depth mixin, also merge array element if not exist.
+    deepMix = function(r, s, force) {
+        if (r && s && typeof r === 'object' && r.constructor === s.constructor) {
+            var mergeArr = Array.isArray(s);
+            if (mergeArr) {
+                for (var i = -1, l = s.length, v; ++i < l;) {
+                    v = s[i];
+                    if (v && typeof v === 'object' && r[i] && typeof r[i] === 'object') {
+                        r[i] = force ? v : deepMix(r[i], v, force);
+                    } else {
+                        if (!~r.indexOf(v)) { r.push(v); }
+                    }
+                }
+            } else {
+                for (var i in s) if (s.hasOwnProperty(i)) { var v = s[i];
+                    if (v && typeof v === 'object' && r[i] && typeof r[i] === 'object') {
+                        r[i] = force ? v : deepMix(r[i], v, force);
+                    } else {
+                        if (r[i] == null || force) { r[i] = v; }
+                    }
+                }
+            }
+        }
+        return r;
+    },
+
+    merge = function(r, s) {
+        var o = {}, args = slice.call(arguments, 0);
+        args.unshift(o);
+        mix.apply(null, args);
+        return o;
+    },
+
+    forEach = function(o, fn) {
+        if (Array.isArray(o)) return o.forEach(fn);
+        else for (var k in o) {
+            if (o.hasOwnProperty(k)) {
+                fn(o[k], k);
+            }
+        }
+    };
 
 var lang = {
     /**
-     * mixin dist object to receiver.
+     * Mixin dist object to receiver.
      *
      * @method mix
      */
     mix: mix,
 
     /**
-     * merge object to a new object.
+     * Depth mixin, also merge array element if exist.
+     * @method deepMixin
+     */
+    deepMix: deepMix,
+
+    /**
+     * Merge object to a new object.
      *
      * @method merge
      */
@@ -78,12 +116,24 @@ var lang = {
      * @param {Object|Array} o
      * @param {Function} fn iterator callback function.
      */
-    forEach: forEach
+    forEach: forEach,
+
+    /**
+     * Inherit the prototype methods from one constructor into another and implements
+     * cotr prototypes.
+     *
+     * extends from #inherits() or module #util
+     */
+    inherits: function(ctor, superCtor, prototype) {
+        return nativeUtil.inherits(ctor, superCtor)
+    }
 };
 
 // alias lang namespces.
 ['hash', 'string', 'array'].forEach(function(ns) {
-    lang[ns] = require('./' + ns);
+    lang[ns] = require('./lib/' + ns);
 });
 
 module.exports = lang;
+
+}(require, exports, module));
