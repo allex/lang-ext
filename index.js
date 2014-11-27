@@ -47,17 +47,19 @@ var slice = [].slice,
         return o;
     },
 
-    // Depth mixin, also merge array element if not exist.
+    // Deep mixin, also merge array element if not exist.
     deepMix = function(r, s, force) {
         if (r && s && typeof r === 'object' && r.constructor === s.constructor) {
             var mergeArr = Array.isArray(s);
             if (mergeArr) {
-                for (var i = -1, l = s.length, v; ++i < l;) {
-                    v = s[i];
-                    if (v && typeof v === 'object' && r[i] && typeof r[i] === 'object') {
-                        r[i] = force ? v : deepMix(r[i], v, force);
+                for (var i = -1, l = s.length, rl = r.length, v, tmp; ++i < l;) { v = s[i];
+                    if (v && typeof v === 'object') {
+                        if (i > rl) { r.push(tmp = (v.constructor === Array ? [] : {})); }
+                        else { tmp = r[i]; }
+                        deepMix(tmp, v, force);
                     } else {
-                        if (!~r.indexOf(v)) { r.push(v); }
+                        if (force) { r[i] = v; }
+                        else if (!~r.indexOf(v)) { r.push(v); }
                     }
                 }
             } else {
