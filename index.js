@@ -4,9 +4,7 @@
  * @author Allex Wang (allex.wxn@gmail.com)
  * Licensed under the MIT license.
  */
-
 (function(require, exports, module) {
-
 'use strict';
 
 function _mix(r, s, deep, force) {
@@ -131,11 +129,12 @@ var lang = {
     }
 };
 
-// alias lang namespces.
-['hash', 'string', 'array'].forEach(function(ns) {
-    lang[ns] = require('./lib/' + ns);
-});
-
+// Exports
 module.exports = lang;
+
+require('fs').readdirSync(__dirname + "/lib/lang").forEach(function (f) {
+  if (!f.match(/\.js$/)) return
+  lang[f.replace(/\.js$/, '')] = require('./lib/lang/' + f);
+});
 
 }(require, exports, module));
