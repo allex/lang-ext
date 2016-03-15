@@ -63,7 +63,7 @@ var slice = [].slice,
             } else {
                 for (var i in s) if (s.hasOwnProperty(i)) { var v = s[i];
                     if (v && typeof v === 'object' && r[i] && typeof r[i] === 'object') {
-                        r[i] = force ? v : deepMix(r[i], v, force);
+                        r[i] = deepMix(r[i], v, force);
                     } else {
                         if (r[i] == null || force) { r[i] = v; }
                     }
